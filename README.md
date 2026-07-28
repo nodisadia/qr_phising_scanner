@@ -1,0 +1,1 @@
+# qr_phising_scanner
