@@ -1,0 +1,9 @@
+flask
+pandas
+scikit-learn
+pyzbar
+pillow
+python-whois
+requests
+joblib
+beautifulsoup4
