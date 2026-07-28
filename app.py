@@ -13,11 +13,19 @@ PAGE = """
 <body style="font-family: sans-serif; max-width: 600px; margin: 40px auto;">
     <h1>QR Code &amp; Phishing URL Scanner</h1>
 
+    <h2>Scan a URL directly</h2>
+    <form method="POST" action="/scan_url">
+        <input type="text" name="manual_url" placeholder="e.g. example.com or https://example.com/page" style="width:70%; padding:6px;" required>
+        <button type="submit">Check URL</button>
+    </form>
+
+    <hr>
     <h2>Upload an image</h2>
     <form method="POST" enctype="multipart/form-data">
         <input type="file" name="qr_image" accept="image/*" required>
         <button type="submit">Scan</button>
     </form>
+
     {% if result %}
         <hr>
         {% if result.error %}
@@ -138,6 +146,19 @@ def check_url():
     result['decoded_from_qr'] = True
     result['confidence'] = float(result['confidence'])
     return jsonify(result)
+
+
+@app.route('/scan_url', methods=['POST'])
+def scan_url():
+    from predict_live import predict_url_uci
+    manual_url = request.form.get('manual_url', '').strip()
+
+    if not manual_url or not looks_like_url(manual_url):
+        result = {'error': f'"{manual_url}" doesn\'t look like a valid URL. Try something like example.com'}
+    else:
+        result = predict_url_uci(manual_url)
+
+    return render_template_string(PAGE, result=result)
 
 
 if __name__ == '__main__':
